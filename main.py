@@ -106,9 +106,7 @@ def facepoints(face_tensors, session):
 
 
 def draw_on_face(images, facepoints):
-    cnt = 0
     for image, points in zip(images, facepoints):
-
 
         original_h, original_w = image.shape[:2]
 
@@ -122,11 +120,7 @@ def draw_on_face(images, facepoints):
         for x, y in zip(landmarks_x, landmarks_y):
             cv2.circle(image, (int(x), int(y)), 3, (0, 255, 0), -1)
         
-        cv2.imwrite(f'{cnt}_.jpg', image)
-        cv2.imwrite(f'{cnt}_.jpg', image)
-
-
-        cnt += 1
+        cv2.imwrite(f'_.jpg', image)
 
 
 def draw_keypoints(image, bboxes, facepoints):
