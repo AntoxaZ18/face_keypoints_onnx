@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 import onnxruntime as ort
 from time import time
+import argparse
 
 mp_face_detection = mp.solutions.face_detection
 mp_drawing = mp.solutions.drawing_utils
@@ -15,8 +16,7 @@ CAM_WIDTH = 1920
 CAM_HEIGHT = 1080
 
 
-for camera_info in enumerate_cameras(cv2.CAP_MSMF):
-    print(f'{camera_info.index}: {camera_info.name} {camera_info.path}')
+
 
 def read_image(path):
     image = cv2.imread(path)
@@ -171,6 +171,11 @@ def process_image(image: np.ndarray, session) -> np.ndarray:
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser(description='ONNX demo')
+    parser.add_argument('-cam', type=int, help='camera index', required=False)
+
+
+
     onnx_model = "mobilenet_relu.onnx"
     sess_options = ort.SessionOptions()
 
@@ -178,8 +183,18 @@ if __name__ == "__main__":
         onnx_model, providers=["CPUExecutionProvider"], sess_options=sess_options
     )
 
+    args = parser.parse_args()
 
-    cap = cv2.VideoCapture(0)
+    print("available cameras: ")
+    for camera_info in enumerate_cameras(cv2.CAP_MSMF):
+        print(f'{camera_info.index}: {camera_info.name} {camera_info.path}')
+
+    if args.cam:
+        cap = cv2.VideoCapture(args.cam)
+    else:
+        print("open default cam")
+        cap = cv2.VideoCapture(0)
+
 
     # Проверка открытия камеры
     if not cap.isOpened():
@@ -208,5 +223,3 @@ if __name__ == "__main__":
 # Освобождение ресурсов
 cap.release()
 cv2.destroyAllWindows()
-
-
