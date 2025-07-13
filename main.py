@@ -4,6 +4,7 @@ import numpy as np
 import onnxruntime as ort
 from time import time
 import argparse
+import sys
 
 mp_face_detection = mp.solutions.face_detection
 mp_drawing = mp.solutions.drawing_utils
@@ -11,11 +12,6 @@ face_detection = mp_face_detection.FaceDetection(model_selection=0, min_detectio
 
 
 from cv2_enumerate_cameras import enumerate_cameras
-
-CAM_WIDTH = 1920
-CAM_HEIGHT = 1080
-
-
 
 
 def read_image(path):
@@ -186,15 +182,20 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print("available cameras: ")
+    cams = set()
     for camera_info in enumerate_cameras(cv2.CAP_MSMF):
         print(f'{camera_info.index}: {camera_info.name} {camera_info.path}')
+        cams.add(camera_info.index)
 
-    if args.cam:
+    if args.cam is not None:
+        if args.cam not in cams:
+            print(f'Camera with index {args.cam} unavalilable')
+            sys.exit()
+        print(f"Open camera with index: {args.cam}")
         cap = cv2.VideoCapture(args.cam)
     else:
         print("open default cam")
         cap = cv2.VideoCapture(0)
-
 
     # Проверка открытия камеры
     if not cap.isOpened():
